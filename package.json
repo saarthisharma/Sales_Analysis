@@ -1,0 +1,36 @@
+{
+  "name": "sales_analysis",
+  "version": "1.0.0",
+  "description": "sales analysis project using express  and mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saarthisharma/Sales_Analysis.git"
+  },
+  "keywords": [
+    "js",
+    "node",
+    "express",
+    "mongodb",
+    "csv"
+  ],
+  "author": "saarthi sharma",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saarthisharma/Sales_Analysis/issues"
+  },
+  "homepage": "https://github.com/saarthisharma/Sales_Analysis#readme",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "config": "^3.3.7",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "joi": "^17.6.0",
+    "mongoose": "^6.2.1",
+    "nodemon": "^2.0.15"
+  }
+}
