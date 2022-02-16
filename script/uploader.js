@@ -1,8 +1,9 @@
 const mongoose = require("mongoose")
+
 const Country = require("../Model/country")
 const Region = require("../Model/region")
 const ItemType = require("../Model/itemType")
-const Order = require("../Model/order")
+const OrderModel = require("../Model/order")
 
 const csv = require('csv-parser')
 const fs = require('fs');
@@ -22,7 +23,7 @@ fs.createReadStream('../Assets/Sales_records.csv')
         let countryId = await findOrInsertCountry(results[index]['Country'])
         let regionId = await findOrInsertRegion(results[index]['Region'])
         let itemTypeId = await findOrInsertItemType(results[index]['Item Type'])
-        // let orders = await findOrInsertOrder() 
+        let orders = await insertOrder(results[index], countryId, regionId, itemTypeId)
     }
 }
 );
@@ -74,4 +75,26 @@ async function findOrInsertItemType(item){
 
 // function to insert orders
 
-// async function 
+async function insertOrder(orderData,countryId,regionId,itemId){
+    try {
+        let orderObject = new OrderModel({
+            "orderPriority" : orderData["Order Priority"],
+            "orderDate" : new Date(),
+            "orderId" : orderData["Order ID"],
+            "shipDate" : new Date(),
+            "unitSold" : orderData["Units Sold"],
+            "unitsPrice" : orderData["Unit Price"],
+            "unitCost" : orderData["Unit Cost"],
+            "totalRevenue" : orderData["Total Revenue"],
+            "totalCost" : orderData["Total Cost"],
+            "totalProfit" : orderData["Total Profit"],
+            "countryId" : countryId,
+            "regionId" : regionId,
+            "itemId" : itemId
+        })
+        await orderObject.save()
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
