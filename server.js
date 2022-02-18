@@ -17,6 +17,7 @@ connectDB();
 app.use(express.json());
 
 // requiring routes
+app.use(""  ,require("./routes/userRoutes"))
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
