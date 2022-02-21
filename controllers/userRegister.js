@@ -58,7 +58,7 @@ exports.userRegister = async(req,res)=>{
             _id: newUser._id
         }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})
+        const token = jwt.sign(payload , process.env.JWT_SECRET)
         
         // saving tokens
         let tokenCollection = new Token({
@@ -100,7 +100,7 @@ exports.userLogin= async(req,res)=>{
             _id: user._id
             }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})      
+        const token = jwt.sign(payload , process.env.JWT_SECRET)      
             
         // saving tokens
         let tokenCollection = new Token({
@@ -148,7 +148,7 @@ exports.updateProfile= async(req,res)=>{
         const userId = req.query._id
 
         const profileUpdate = await User.updateOne(
-            {"_id" :userId},
+            {"_id": userId},
             {
                 $set:
                 {
@@ -162,7 +162,7 @@ exports.updateProfile= async(req,res)=>{
             }
         )
     
-        return responseHandler.handler(res,true, message.customMessages.updateProfile,[], 201)
+        return responseHandler.profileHandler(res,true, message.customMessages.updateProfile,req.body, 201)
 
     } catch (error) {
         console.log(error)

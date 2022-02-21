@@ -22,6 +22,11 @@ app.use(""  ,require("./routes/userRoutes"))
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
+app.use(function onError(err, req, res, next) {
+    res.statusCode = 500;
+    res.end(err + "\n");
+});
+
 app.listen(PORT, () =>{
     console.log(`server is running at http://localhost:${PORT}`)
 })

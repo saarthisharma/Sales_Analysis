@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+// requiring middleware
+const {userAuthorization} = require("../middleware/UserAuthorization")
+
 // requiring user registration controller
 const userController = require("../controllers/userRegister")
 
@@ -8,7 +11,6 @@ const userController = require("../controllers/userRegister")
 router.post("/registration",userController.userRegister)
 router.post("/login",userController.userLogin)
 router.post("/logout",userController.userLogout)
-router.post("/updateProfile",userController.updateProfile)
-
+router.post("/updateProfile", userAuthorization, userController.updateProfile)
 
 module.exports = router
