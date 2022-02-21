@@ -41,8 +41,8 @@ exports.userRegister = async(req,res)=>{
         
         // hash pwd
         const hashedPassword = await bcrypt.hash(password , Number(process.env.saltRounds))
-        const hashedConfirmPassword = await bcrypt.hash(confirmPassword , Number(process.env.saltRounds))
-        
+
+        const hashedConfirmPassword = hashedPassword
         // new user
         let creatingNewUser = new User({
             email: email,
@@ -68,7 +68,6 @@ exports.userRegister = async(req,res)=>{
         
         return responseHandler.handler(res,true, message.customMessages.userCreated,token, 201)
     } catch (error) {
-        console.log(error)
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }
@@ -80,36 +79,35 @@ exports.userLogin= async(req,res)=>{
         let validation = userValidation(req.body);
 
         if(validation && validation.error == true){
-            console.log("validation successful")
             return responseHandler.handler(res, false, validation.message , [], 422)
         }
-        // if exist
+
+        // if not exist
         let user = await User.findOne({email:email})
-        if(!user){
-            return responseHandler.handler(res,false, message.customMessages.notLoggedIn, [], 500)
-        }
-        console.log(password)
-        // hash pwd 
-        const hashedPassword = await bcrypt.hash(password , Number(process.env.saltRounds))
         
-        console.log(hashedPassword)
-        console.log(email)
-        console.log("============")
-        // authentication
-        let emailPasswordMatch = await User.findOne({email:email, password:hashedPassword})
-
-        if (!emailPasswordMatch) {
-            return responseHandler.handler(res,false, message.customMessages.notLoggedIn, [], 500)
+        if(!user){
+            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
         }
 
+        const passwordMatch = await bcrypt.compare(password , user.password);
+        
+        if(!passwordMatch){
+            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
+        }
         const payload = {
             _id: user._id
-        }
+            }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})
-        return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)        
+        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})      
+            
+        // saving tokens
+        let tokenCollection = new Token({
+            token : token,
+            UserId: user._id
+        })
+        let saveToken =await tokenCollection.save()
+        return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)         
     } catch (error) {
-        console.log(error)
-        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
+        return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
     }
 }
