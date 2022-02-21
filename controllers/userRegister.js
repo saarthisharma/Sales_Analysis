@@ -16,6 +16,8 @@ const Token = require("../Model/tokens")
 
 // requiring joi validator
 const { userValidation } = require("../validations/userRegisterJoi");
+const { tokenValidation } = require("../validations/tokenValidation");
+const { ProfileValidation } = require("../validations/updateProfileValidation");
 
 // api for signUp
 exports.userRegister = async(req,res)=>{
@@ -109,5 +111,61 @@ exports.userLogin= async(req,res)=>{
         return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)         
     } catch (error) {
         return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
+    }
+}
+
+
+exports.userLogout= async(req,res)=>{
+    try {
+        const{token} = req.body
+
+        let validation = tokenValidation(req.body);
+
+        if(validation && validation.error == true){
+            return responseHandler.handler(res, false, validation.message , [], 422)
+        }
+
+        // deleting token
+        const deleteToken = Token.find({token:token}).remove().exec();
+        console.log(deleteToken)
+        return responseHandler.handler(res,true, message.customMessages.logoutMessage,[], 201)  
+    } catch (error) {
+        console.log(error)
+        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
+    }
+}
+
+exports.updateProfile= async(req,res)=>{
+    try {
+        const{firstName,lastName,pinCode,city,street,houseNumber}=req.body
+
+        let validation = ProfileValidation(req.body);
+
+        if(validation && validation.error == true){
+            return responseHandler.handler(res, false, validation.message , [], 422)
+        }
+
+        const userId = req.query._id
+
+        const profileUpdate = await User.updateOne(
+            {"_id" :userId},
+            {
+                $set:
+                {
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "pinCode": pinCode,
+                    "city": city,
+                    "street": street,
+                    "houseNumber":houseNumber
+                }
+            }
+        )
+    
+        return responseHandler.handler(res,true, message.customMessages.updateProfile,[], 201)
+
+    } catch (error) {
+        console.log(error)
+        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }

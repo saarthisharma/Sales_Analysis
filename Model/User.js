@@ -1,11 +1,5 @@
 const mongoose = require("mongoose")
 
-const AddressSchema = mongoose.Schema({
-    city: String,
-    street: String,
-    houseNumber: String,
-  });
-
 const UserSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -36,8 +30,16 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
-    address: {
-        type: AddressSchema,
+    city: {
+        type:String,
+        required: false
+    },
+    street: {
+        type:String,
+        required: false
+    },
+    houseNumber: {
+        type:String,
         required: false
     }
 })
