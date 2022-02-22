@@ -134,13 +134,22 @@ exports.userLogout= async(req,res)=>{
         const decoded = jwt.verify(token,process.env.JWT_SECRET);  
         const UserId = decoded._id 
 
-        const findToken = await Token.findOne({UserId:UserId})
+        const findToken = await Token.find({UserId:UserId})
+        let tokenMatch = false
+        for(let element of findToken){
+            
+            tokenMatch = await bcrypt.compare(token,element.token)
+            
+            if(tokenMatch){
+            
+                const deleteToken = Token.find({UserId:UserId}).deleteOne().exec();
+                break
+            }
+        }
         
-        // comparing token with hashed token
-        const compareToken = await bcrypt.compare(token,findToken.token)
-        
-        // deleting token
-        const deleteToken = Token.find({UserId:UserId}).deleteOne().exec();
+        if(!tokenMatch){
+            return responseHandler.handler(res,false, message.customMessages.TokenDatabaseEmpty, [], 500)
+        }
         
         return responseHandler.handler(res,true, message.customMessages.logoutMessage,[], 201)  
     } catch (error) {

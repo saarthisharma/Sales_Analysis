@@ -18,7 +18,7 @@ exports.userAuthorization = async(req,res,next)=> {
         const userId = decoded._id 
         console.log("userId",userId)
 
-        const findToken = await Token.findOne({UserId:userId})
+        const findToken = await Token.find({UserId:userId})
         console.log("===>",findToken)
         
         // comparing token with hashed token

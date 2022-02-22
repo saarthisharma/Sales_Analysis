@@ -7,5 +7,6 @@ module.exports.customMessages= {
     "Loginerror" : "Email id or password is incorrect",
     "logoutMessage":"user logged out successfully",
     "updateProfile":"Profile updated successfully",
+    "TokenDatabaseEmpty":"unable to authenticate",
     "error" : "Internal server error"
 }
