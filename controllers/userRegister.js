@@ -60,9 +60,11 @@ exports.userRegister = async(req,res)=>{
 
         const token = jwt.sign(payload , process.env.JWT_SECRET)
         
+        const hashedToken = await bcrypt.hash(token,Number(process.env.saltRounds))
+        
         // saving tokens
         let tokenCollection = new Token({
-            token : token,
+            token : hashedToken,
             UserId: newUser
         })
 
@@ -100,11 +102,13 @@ exports.userLogin= async(req,res)=>{
             _id: user._id
             }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET)      
+        const token = jwt.sign(payload , process.env.JWT_SECRET)   
+        
+        const hashedToken = await bcrypt.hash(token,Number(process.env.saltRounds))
             
         // saving tokens
         let tokenCollection = new Token({
-            token : token,
+            token : hashedToken,
             UserId: user._id
         })
         let saveToken =await tokenCollection.save()
@@ -117,6 +121,8 @@ exports.userLogin= async(req,res)=>{
 
 exports.userLogout= async(req,res)=>{
     try {
+        // let UserId = mongoose.SchemaTypes.ObjectId;
+
         const{token} = req.body
 
         let validation = tokenValidation(req.body);
@@ -124,10 +130,18 @@ exports.userLogout= async(req,res)=>{
         if(validation && validation.error == true){
             return responseHandler.handler(res, false, validation.message , [], 422)
         }
+        
+        const decoded = jwt.verify(token,process.env.JWT_SECRET);  
+        const UserId = decoded._id 
 
+        const findToken = await Token.findOne({UserId:UserId})
+        
+        // comparing token with hashed token
+        const compareToken = await bcrypt.compare(token,findToken.token)
+        
         // deleting token
-        const deleteToken = Token.find({token:token}).remove().exec();
-        console.log(deleteToken)
+        const deleteToken = Token.find({UserId:UserId}).deleteOne().exec();
+        
         return responseHandler.handler(res,true, message.customMessages.logoutMessage,[], 201)  
     } catch (error) {
         console.log(error)
