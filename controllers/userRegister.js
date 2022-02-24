@@ -5,10 +5,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv")
 dotenv.config({path : "../.env"})
+const crypto = require("crypto");
 
 const responseHandler = require("../helper/responseHandler")
 const message = require("../helper/messages")
 
+// requiring crypto module
+const {encryptToken} = require("../helper/cryptoModule")
 
 // requiring model
 const User = require("../Model/User")
@@ -60,7 +63,7 @@ exports.userRegister = async(req,res)=>{
 
         const token = jwt.sign(payload , process.env.JWT_SECRET)
         
-        const hashedToken = await bcrypt.hash(token,Number(process.env.saltRounds))
+        let hashedToken = encryptToken(token);
         
         // saving tokens
         let tokenCollection = new Token({
@@ -94,17 +97,18 @@ exports.userLogin= async(req,res)=>{
         }
 
         const passwordMatch = await bcrypt.compare(password , user.password);
-        
+
         if(!passwordMatch){
             return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
         }
         const payload = {
-            _id: user._id
+            _id: user._id,
+            timestamp: new Date().getTime()
             }
 
         const token = jwt.sign(payload , process.env.JWT_SECRET)   
-        
-        const hashedToken = await bcrypt.hash(token,Number(process.env.saltRounds))
+
+        let hashedToken = encryptToken(token);
             
         // saving tokens
         let tokenCollection = new Token({
@@ -121,36 +125,25 @@ exports.userLogin= async(req,res)=>{
 
 exports.userLogout= async(req,res)=>{
     try {
-        // let UserId = mongoose.SchemaTypes.ObjectId;
-
-        const{token} = req.body
+        const {token} = req.body
 
         let validation = tokenValidation(req.body);
-
+        
         if(validation && validation.error == true){
             return responseHandler.handler(res, false, validation.message , [], 422)
         }
-        
-        const decoded = jwt.verify(token,process.env.JWT_SECRET);  
-        const UserId = decoded._id 
 
-        const findToken = await Token.find({UserId:UserId})
-        let tokenMatch = false
-        for(let element of findToken){
-            
-            tokenMatch = await bcrypt.compare(token,element.token)
-            
-            if(tokenMatch){
-            
-                const deleteToken = Token.find({UserId:UserId}).deleteOne().exec();
-                break
-            }
-        }
-        
-        if(!tokenMatch){
+        // secret
+        const secret = process.env.CRYPTO_SECRET;
+
+        // Calling createHash method
+        const hash = crypto.createHash('sha256', secret).update(token).digest('hex');
+
+        const deleteToken = await Token.find({token:hash}).deleteOne().exec()
+    
+        if(deleteToken.deletedCount == 0){
             return responseHandler.handler(res,false, message.customMessages.TokenDatabaseEmpty, [], 500)
         }
-        
         return responseHandler.handler(res,true, message.customMessages.logoutMessage,[], 201)  
     } catch (error) {
         console.log(error)
@@ -168,7 +161,7 @@ exports.updateProfile= async(req,res)=>{
             return responseHandler.handler(res, false, validation.message , [], 422)
         }
 
-        const userId = req.query._id
+        const userId = req.user._id
 
         const profileUpdate = await User.updateOne(
             {"_id": userId},
