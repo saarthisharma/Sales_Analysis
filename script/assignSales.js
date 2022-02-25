@@ -10,14 +10,15 @@ const userArray = ["62175cb5e96065e3ab4a02fe" , "62175cc2e96065e3ab4a0303" , "62
 
 async function assignUser(){
     try {
-        let fetchOrderId = await OrderModel.find({});
-        fetchOrderId.map( (element)=>{
-            const random = Math.floor(Math.random() * userArray.length);
-            element.userId = userArray[random]; 
+        let fetchOrderId = await OrderModel.find({userId : {$exists : false}}).limit(300000);
+        
+        fetchOrderId.map( async (element) => {
+            const randomUserId = userArray[Math.floor(Math.random() * userArray.length)];
+            let response = await OrderModel.findOneAndUpdate({_id : element._id }, {userId : randomUserId});
+            console.log(response)
         });
-        console.log("fetchOrderId", fetchOrderId);
-    } catch (e) {
-        console.log("error-->", e);
+    } catch (error) {
+        console.log("error-->", error);
     }
     
 }
