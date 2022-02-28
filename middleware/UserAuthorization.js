@@ -50,19 +50,3 @@ exports.userAuthorization = async(req,res,next)=> {
         return res.status(401).send("unauthorized access")
     }
 }
-
-
-
-
-
-
-// // // getting userId from token
-        // const decoded = jwt.verify(token,process.env.JWT_SECRET);  
-        // const userId = decoded._id 
-        // console.log("userId",userId)
-
-        // const findToken = await Token.find({UserId:userId})
-        // console.log("===>",findToken)
-
-        
-        // console.log("------>")
