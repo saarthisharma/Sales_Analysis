@@ -102,17 +102,21 @@ exports.emailVerificationApi = async (req,res) => {
             if(error){
                 return responseHandler.handler(res,false, message.customMessages.emailVerficationError, [], 500)
             }
-            else{
-                let user = await User.findOne({email:decoded.email},{token:token})
-                let udpateEmailStatus = await User.updateOne({email:decoded.email},
-                {$set:
-                    {emailVerified:true},
-                $unset:
-                    {verifyEmailToken:""}
-                }
-                )       
-                return responseHandler.handler(res,true, message.customMessages.emailVerficationSuccess,[], 201)    
+
+            let user = await User.findOne({email:decoded.email},{token:token})
+            console.log(user)
+            if(!user){
+                return responseHandler.handler(res,false, message.customMessages.emailVerficationError, [], 500)
             }
+
+            let udpateEmailStatus = await User.updateOne({email:decoded.email,token:token},
+                {
+                    $set:{emailVerified:true},
+                    $unset:{verifyEmailToken:1}
+                }
+            )       
+            return responseHandler.handler(res,true, message.customMessages.emailVerficationSuccess,[], 201)    
+        
         })
     } catch (error) {
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)

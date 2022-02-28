@@ -18,7 +18,6 @@ const signUpVerifyMail = async (email, token) =>{
             console.log('error :', error);
         }
         else{
-            console.log(data)
             sendEmail({
                 subject: "Test",
                 text: "testing verification email",
