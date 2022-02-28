@@ -5,10 +5,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv")
 dotenv.config({path : "../.env"})
+const crypto = require("crypto");
 
 const responseHandler = require("../helper/responseHandler")
 const message = require("../helper/messages")
 
+// requiring crypto module
+const {encryptToken} = require("../helper/cryptoModule")
 
 // requiring model
 const User = require("../Model/User")
@@ -16,6 +19,8 @@ const Token = require("../Model/tokens")
 
 // requiring joi validator
 const { userValidation } = require("../validations/userRegisterJoi");
+const { tokenValidation } = require("../validations/tokenValidation");
+const { ProfileValidation } = require("../validations/updateProfileValidation");
 
 // api for signUp
 exports.userRegister = async(req,res)=>{
@@ -41,8 +46,8 @@ exports.userRegister = async(req,res)=>{
         
         // hash pwd
         const hashedPassword = await bcrypt.hash(password , Number(process.env.saltRounds))
-        const hashedConfirmPassword = await bcrypt.hash(confirmPassword , Number(process.env.saltRounds))
-        
+
+        const hashedConfirmPassword = hashedPassword
         // new user
         let creatingNewUser = new User({
             email: email,
@@ -56,11 +61,13 @@ exports.userRegister = async(req,res)=>{
             _id: newUser._id
         }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})
+        const token = jwt.sign(payload , process.env.JWT_SECRET)
+        
+        let hashedToken = encryptToken(token);
         
         // saving tokens
         let tokenCollection = new Token({
-            token : token,
+            token : hashedToken,
             UserId: newUser
         })
 
@@ -68,7 +75,6 @@ exports.userRegister = async(req,res)=>{
         
         return responseHandler.handler(res,true, message.customMessages.userCreated,token, 201)
     } catch (error) {
-        console.log(error)
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }
@@ -80,34 +86,100 @@ exports.userLogin= async(req,res)=>{
         let validation = userValidation(req.body);
 
         if(validation && validation.error == true){
-            console.log("validation successful")
             return responseHandler.handler(res, false, validation.message , [], 422)
         }
-        // if exist
+
+        // if not exist
         let user = await User.findOne({email:email})
-        if(!user){
-            return responseHandler.handler(res,false, message.customMessages.notLoggedIn, [], 500)
-        }
-        console.log(password)
-        // hash pwd 
-        const hashedPassword = await bcrypt.hash(password , Number(process.env.saltRounds))
         
-        console.log(hashedPassword)
-        console.log(email)
-        console.log("============")
-        // authentication
-        let emailPasswordMatch = await User.findOne({email:email, password:hashedPassword})
-
-        if (!emailPasswordMatch) {
-            return responseHandler.handler(res,false, message.customMessages.notLoggedIn, [], 500)
+        if(!user){
+            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
         }
 
+        const passwordMatch = await bcrypt.compare(password , user.password);
+
+        if(!passwordMatch){
+            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
+        }
         const payload = {
-            _id: user._id
+            _id: user._id,
+            timestamp: new Date().getTime()
+            }
+
+        const token = jwt.sign(payload , process.env.JWT_SECRET)   
+
+        let hashedToken = encryptToken(token);
+            
+        // saving tokens
+        let tokenCollection = new Token({
+            token : hashedToken,
+            UserId: user._id
+        })
+        let saveToken =await tokenCollection.save()
+        return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)         
+    } catch (error) {
+        return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
+    }
+}
+
+
+exports.userLogout= async(req,res)=>{
+    try {
+        const {token} = req.body
+
+        let validation = tokenValidation(req.body);
+        
+        if(validation && validation.error == true){
+            return responseHandler.handler(res, false, validation.message , [], 422)
         }
 
-        const token = jwt.sign(payload , process.env.JWT_SECRET , {expiresIn : '1hr'})
-        return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)        
+        // secret
+        const secret = process.env.CRYPTO_SECRET;
+
+        // Calling createHash method
+        const hash = crypto.createHash('sha256', secret).update(token).digest('hex');
+
+        const deleteToken = await Token.find({token:hash}).deleteOne().exec()
+    
+        if(deleteToken.deletedCount == 0){
+            return responseHandler.handler(res,false, message.customMessages.TokenDatabaseEmpty, [], 500)
+        }
+        return responseHandler.handler(res,true, message.customMessages.logoutMessage,[], 201)  
+    } catch (error) {
+        console.log(error)
+        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
+    }
+}
+
+exports.updateProfile= async(req,res)=>{
+    try {
+        const{firstName,lastName,pinCode,city,street,houseNumber}=req.body
+
+        let validation = ProfileValidation(req.body);
+
+        if(validation && validation.error == true){
+            return responseHandler.handler(res, false, validation.message , [], 422)
+        }
+
+        const userId = req.user._id
+
+        const profileUpdate = await User.updateOne(
+            {"_id": userId},
+            {
+                $set:
+                {
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "pinCode": pinCode,
+                    "city": city,
+                    "street": street,
+                    "houseNumber":houseNumber
+                }
+            }
+        )
+    
+        return responseHandler.profileHandler(res,true, message.customMessages.updateProfile,req.body, 201)
+
     } catch (error) {
         console.log(error)
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)

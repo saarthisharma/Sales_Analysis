@@ -27,13 +27,18 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.2",
     "config": "^3.3.7",
+    "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
+    "email-templates": "^8.0.9",
     "express": "^4.17.2",
+    "googleapis": "^95.0.0",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.1",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
     "winston": "^3.6.0"
   }

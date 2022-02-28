@@ -17,3 +17,24 @@ module.exports.handler=(res,error,message,token,status)=>{
         })
     }  
 }
+
+
+module.exports.profileHandler=(res,error,message,updatedData,status)=>{
+    if(!error){
+        return res.status(status).json({
+            message,
+            status:false,
+            code: status,
+            updatedData: updatedData
+        })
+    }
+    else
+    {
+        return res.status(status).json({
+            message,
+            status: error,
+            code: status,
+            updatedData: updatedData
+        })
+    }  
+}

@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.SchemaTypes.ObjectId;
 
 const OrderSchema = new mongoose.Schema({
+    userId:{
+        type:String
+    },
     orderPriority:{
         type:String,
         required:true

@@ -11,7 +11,6 @@ const dotenv = require("dotenv")
 dotenv.config({path : "../.env"})
 
 const connectDB = require("../config/dbConnection");
-const { Console } = require("console");
 connectDB();
 
 let results = []
