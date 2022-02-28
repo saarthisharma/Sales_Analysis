@@ -48,18 +48,21 @@ const createTransporter = async () => {
   console.log('response :', response);
 }
 
-ejs.renderFile('../views/index.ejs', function (err, data) {
-    if (err) {
-        console.log(err);
-    } else {
-        sendEmail({
-        subject: "Test",
-        text: "I am sending an email from nodemailer!",
-        to: "isaarthisharma@gmail.com",
-        from: process.env.EMAIL,
-        generateTextFromHTML: true,
-        html: data
-        });
-    }
-})
+// ejs.renderFile('../views/index.ejs', function (err, data) {
+//     if (err) {
+//         console.log(err);
+//     } else {
+//         sendEmail({
+//         subject: "Test",
+//         text: "I am sending an email from nodemailer!",
+//         to: "isaarthisharma@gmail.com",
+//         from: process.env.EMAIL,
+//         generateTextFromHTML: true,
+//         html: data
+//         });
+//     }
+// })
 
+module.exports = {
+  sendEmail
+}

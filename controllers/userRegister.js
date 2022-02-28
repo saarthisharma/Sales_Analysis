@@ -10,6 +10,9 @@ const crypto = require("crypto");
 const responseHandler = require("../helper/responseHandler")
 const message = require("../helper/messages")
 
+// requiring email sending module
+const {signUpVerifyMail} = require("../utils/mails")
+
 // requiring crypto module
 const {encryptToken} = require("../helper/cryptoModule")
 
@@ -48,13 +51,25 @@ exports.userRegister = async(req,res)=>{
         const hashedPassword = await bcrypt.hash(password , Number(process.env.saltRounds))
 
         const hashedConfirmPassword = hashedPassword
+
+        // verification email process 
+        // jwt
+        const newPayload = {
+            email:email
+        }
+
+        const emailVerificationToken = jwt.sign(newPayload , process.env.JWT_SECRET)
+        
         // new user
         let creatingNewUser = new User({
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            verifyEmailToken: emailVerificationToken
         });
         
         let newUser = await creatingNewUser.save()
+
+        await signUpVerifyMail(email,emailVerificationToken)
         
         // jwt
         const payload = {
@@ -73,11 +88,37 @@ exports.userRegister = async(req,res)=>{
 
         let saveToken =await tokenCollection.save() 
         
-        return responseHandler.handler(res,true, message.customMessages.userCreated,token, 201)
+        return responseHandler.handler(res,true, message.customMessages.userCreated,emailVerificationToken, 201)
     } catch (error) {
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }
+
+exports.emailVerificationApi = async (req,res) => {
+    try {
+        const{token} = req.headers
+        const isverify = jwt.verify(token , process.env.JWT_SECRET ,async function(error , data){
+            const decoded = jwt.decode(token)
+            if(error){
+                return responseHandler.handler(res,false, message.customMessages.emailVerficationError, [], 500)
+            }
+            else{
+                let user = await User.findOne({email:decoded.email},{token:token})
+                let udpateEmailStatus = await User.updateOne({email:decoded.email},
+                {$set:
+                    {emailVerified:true},
+                $unset:
+                    {verifyEmailToken:""}
+                }
+                )       
+                return responseHandler.handler(res,true, message.customMessages.emailVerficationSuccess,[], 201)    
+            }
+        })
+    } catch (error) {
+        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
+    }
+}
+
 
 exports.userLogin= async(req,res)=>{
     try {

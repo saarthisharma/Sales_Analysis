@@ -1,0 +1,4 @@
+<!-- <a href="<%= link %>" target="_blank">link</a> -->
+    <!-- <a href="http://www.google.com" target="_blank"><button>Click me !</button></a> -->
+    <!-- <a href="<%=http://www.google.com%>" target="_blank"><button>Click me !</button></a> -->
+    <!-- <a href="<%=http://localhost:3000/verifyemail/token%>" target="_blank"><button>Click to verify your account</button></a> -->
