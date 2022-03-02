@@ -6,6 +6,7 @@ const req = require("express/lib/request");
 const dotenv = require("dotenv")
 const path = require("path");
 dotenv.config({path : ".env"})
+global.__basedir = __dirname;
 
 const PORT = process.env.PORT || 8080
 
