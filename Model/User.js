@@ -41,6 +41,14 @@ const UserSchema = new mongoose.Schema({
     houseNumber: {
         type:String,
         required: false
+    },
+    verifyEmailToken: {
+        type:String,
+        required:true
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
     }
 })
 

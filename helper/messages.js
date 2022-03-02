@@ -8,5 +8,7 @@ module.exports.customMessages= {
     "logoutMessage":"user logged out successfully",
     "updateProfile":"Profile updated successfully",
     "TokenDatabaseEmpty":"unable to authenticate",
+    "emailVerficationError":"unable to verify your email address",
+    "emailVerficationSuccess":"email verified successfully",
     "error" : "Internal server error"
 }
