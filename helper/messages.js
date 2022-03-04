@@ -10,5 +10,10 @@ module.exports.customMessages= {
     "TokenDatabaseEmpty":"unable to authenticate",
     "emailVerficationError":"unable to verify your email address",
     "emailVerficationSuccess":"email verified successfully",
+    "orderDataAdded":"data added successfully",
+    "orderDataUpdated":"data updated successfully",
+    "orderDataDeleted":"data deleted successfully",
+    "paginatedData":"data fetched successfully",
+
     "error" : "Internal server error"
 }

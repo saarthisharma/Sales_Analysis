@@ -58,6 +58,14 @@ const OrderSchema = new mongoose.Schema({
         type:ObjectId,
         required:true
     },
+    addedViaApi:{
+        type:Number,
+        required:false
+    },
+    isDeleted:{
+        type:Number,
+        required:false
+    }
 });
 
 module.exports = new mongoose.model('Order' , OrderSchema);
