@@ -62,7 +62,7 @@ exports.addOrders = async(req,res)=>{
 
         })
         let newData = await add.save()
-        return responseHandler.messageHandler(res,true, message.customMessages.orderDataAdded,newData, 201)
+        return responseHandler.handler(res,true, message.customMessages.orderDataAdded,newData, 201)
 
     } catch (error) {
         console.log('error :', error);
@@ -100,7 +100,7 @@ exports.updateOrders = async(req,res)=>{
                         totalProfit:req.body.totalProfit
                     }
             })
-            return responseHandler.messageHandler(res,true, message.customMessages.orderDataUpdated,req.body, 201)
+            return responseHandler.handler(res,true, message.customMessages.orderDataUpdated,req.body, 201)
     } catch (error) {
         console.log('error :', error);
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
@@ -120,14 +120,14 @@ exports.softDelete = async(req,res)=>{
                     isDeleted:1
                 }
             })
-            return responseHandler.messageHandler(res,true, message.customMessages.orderDataDeleted,[], 201)
+            return responseHandler.handler(res,true, message.customMessages.orderDataDeleted,[], 201)
     } catch (error) {
         console.log('error :', error);
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }
 
-// api to list order data with paging , filter and sorting
+// api to list all the order of users with paging , filter and sorting
 exports.listOrders = async(req,res)=>{
     try {
         let page = req.query.page;
@@ -150,84 +150,9 @@ exports.listOrders = async(req,res)=>{
 
         let data = await OrderModel.find(query).sort(sort).skip(skip).limit(limit)
         
-        return responseHandler.messageHandler(res,true, message.customMessages.paginatedData,data, 201)
+        return responseHandler.handler(res,true, message.customMessages.paginatedData,data, 201)
     } catch (error) {
         console.log('error :', error);
-        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
-    }
-}
-
-// api for admin user can see all users order data
-exports.adminGettingData = async(req,res)=>{
-    try {
-            let page = req.query.page;
-
-            let rowsPerPage = req.query.rowsPerPage;
-
-            let sortValue =  req.query.sortValue;
-                    
-            let totalDocuments = await OrderModel.find().count()
-
-            let numberOfPages = Math.floor(totalDocuments / rowsPerPage)
-
-            let sort = {orderId : sortValue}
-
-            let skip = (page - 1) * rowsPerPage
-
-            let limit = rowsPerPage
-
-            let data = await OrderModel.find().sort(sort).skip(skip).limit(limit)
-
-            return responseHandler.messageHandler(res,true, message.customMessages.paginatedData,data, 201)
-    } catch (error) {
-        console.log('error :', error);
-        return responseHandler.handler(res,false, message.customMessages.error, [], 500)     
-    }
-}
-
-// admin activate/deactivate users api
-exports.adminManageUsers = async(req,res)=>{
-    try {
-        let data = await User.findOne({_id:req.query.id})
-        if(data.isActive){
-            deActivationMessage = "user deactivate successfully"
-            await User.updateOne({_id:req.query.id},
-                {
-                    $set:
-                    {
-                        isActive:0
-                    }
-                }
-                )
-                return responseHandler.messageHandler(res,true,deActivationMessage,[], 201)
-            }
-            else{
-                ActivationMessage = "user activate successfully"
-                await User.updateOne({_id:req.query.id},
-                    {
-                        $set:
-                        {
-                            isActive:1
-                        }
-                    }
-                    )
-                    return responseHandler.messageHandler(res,true,ActivationMessage,[], 201)
-            }
-    } catch (error) {
-        console.log('error :', error);
-        return responseHandler.handler(res,false, message.customMessages.error, [], 500)
-    }
-}
-
-// api for admin user fetching all other users
-exports.adminListUsers = async(req,res)=>{
-    try {
-        let data = await User.find({isAdmin : {$exists : false}})
-        
-        return responseHandler.messageHandler(res,true, message.customMessages.paginatedData,data, 201)
-    } catch (error) {
-        console.log('error :', error);
-        
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
     }
 }
