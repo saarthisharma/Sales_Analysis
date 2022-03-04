@@ -62,7 +62,6 @@ exports.addOrders = async(req,res)=>{
 
         })
         let newData = await add.save()
-        console.log('newData :', newData);
         return responseHandler.messageHandler(res,true, message.customMessages.orderDataAdded,newData, 201)
 
     } catch (error) {
@@ -150,7 +149,6 @@ exports.listOrders = async(req,res)=>{
         let limit = rowsPerPage
 
         let data = await OrderModel.find(query).sort(sort).skip(skip).limit(limit)
-        console.log('data :', data);
         
         return responseHandler.messageHandler(res,true, message.customMessages.paginatedData,data, 201)
     } catch (error) {
@@ -179,7 +177,6 @@ exports.adminGettingData = async(req,res)=>{
             let limit = rowsPerPage
 
             let data = await OrderModel.find().sort(sort).skip(skip).limit(limit)
-            console.log('data :', data);
 
             return responseHandler.messageHandler(res,true, message.customMessages.paginatedData,data, 201)
     } catch (error) {
@@ -203,7 +200,6 @@ exports.adminManageUsers = async(req,res)=>{
                 }
                 )
                 return responseHandler.messageHandler(res,true,deActivationMessage,[], 201)
-                // return res.status(201).json({message:deActivationMessage})
             }
             else{
                 ActivationMessage = "user activate successfully"
@@ -216,9 +212,7 @@ exports.adminManageUsers = async(req,res)=>{
                     }
                     )
                     return responseHandler.messageHandler(res,true,ActivationMessage,[], 201)
-                    // return res.status(201).json({message:ActivationMessage})
             }
-            // return res.send("working")
     } catch (error) {
         console.log('error :', error);
         return responseHandler.handler(res,false, message.customMessages.error, [], 500)
