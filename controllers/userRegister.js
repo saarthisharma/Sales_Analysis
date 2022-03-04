@@ -223,7 +223,7 @@ exports.updateProfile= async(req,res)=>{
             }
         )
     
-        return responseHandler.profileHandler(res,true, message.customMessages.updateProfile,req.body, 201)
+        return responseHandler.handler(res,true, message.customMessages.updateProfile,req.body, 201)
 
     } catch (error) {
         console.log(error)

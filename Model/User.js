@@ -49,6 +49,14 @@ const UserSchema = new mongoose.Schema({
     emailVerified: {
         type: Boolean,
         default: false
+    },
+    isActive: {
+        type:Number,
+        default:1
+    },
+    isAdmin: {
+        type:Number,
+        default:1
     }
 })
 

@@ -9,7 +9,7 @@ const User = require("../Model/User")
 const Token = require("../Model/tokens");
 const express = require("express");
 
-exports.userAuthorization = async(req,res,next)=> {
+exports.adminAuthorization = async(req,res,next)=> {
     try {
         const token = req.header("token")
 
@@ -19,7 +19,7 @@ exports.userAuthorization = async(req,res,next)=> {
 
         const matchToken = await Token.findOne({token:hash})
 
-        console.log('matchToken :', matchToken);
+        // console.log('matchToken :', matchToken);
 
         if(hash == matchToken.token){
 
@@ -28,21 +28,19 @@ exports.userAuthorization = async(req,res,next)=> {
                 if(error){
                     return res.status(401).send("unauthorized access")
                 }
-                else{
-                    let user = await User.findOne({"_id":data._id})
-                    console.log('user :', user);
+                
+                let user = await User.findOne({"_id":data._id}).lean();
+                if(!user){
+                    return res.status(401).send("unauthorized access")
+                }
 
-                // user must logged in to update
-                // if not logged in send error
-                    if(!user){
-                        return res.status(401).send("unauthorized access")
-                    }
+                if(!user.isAdmin){
+                    return res.status(401).send("not an admin user")
+                }
                 req.user = user
                 req.token = token
                 next()
-            }
         });
-
         }
         
     } catch (error) {

@@ -20,6 +20,9 @@ app.use(express.json());
 // requiring routes
 app.use(""  ,require("./routes/userRoutes"))
 
+// requiring admin routes
+app.use("" ,require("./routes/adminRoutes"))
+
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
