@@ -7,7 +7,7 @@ const {adminAuthorization} = require("../middleware/adminAuthorization")
 // requiring admin controller
 const adminController = require("../controllers/adminController")
 
-router.get("/admin",adminAuthorization,adminController.adminGettingData)
+router.get("/listOrders",adminAuthorization,adminController.adminGettingData)
 router.post("/userActivation",adminAuthorization,adminController.adminManageUsers)
 router.get("/listUsers",adminAuthorization,adminController.adminListUsers)
 

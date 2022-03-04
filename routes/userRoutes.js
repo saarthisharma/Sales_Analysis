@@ -15,7 +15,7 @@ const salesCrudController = require("../controllers/salesCrud")
 router.post("/addsalesData",userAuthorization,salesCrudController.addOrders)
 router.put("/updateOrder/:id",userAuthorization,salesCrudController.updateOrders)
 router.put("/deleteOrder/:id",userAuthorization,salesCrudController.softDelete)
-router.get("/listOrder",userAuthorization,salesCrudController.listOrders)
+router.get("/listUserOrders",userAuthorization,salesCrudController.listOrders)
 
 // routes for registration
 router.post("/registration",userController.userRegister)
