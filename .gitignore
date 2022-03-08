@@ -3,3 +3,4 @@ node_modules
 Assets
 logs
 package-lock.json
+*.csv
