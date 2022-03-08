@@ -1,3 +1,4 @@
+// signup , login for customer type users
 const req = require("express/lib/request");
 const res = require("express/lib/response");
 const mongoose = require("mongoose");
@@ -25,8 +26,7 @@ const { userValidation } = require("../validations/userRegisterJoi");
 const { tokenValidation } = require("../validations/tokenValidation");
 const { ProfileValidation } = require("../validations/updateProfileValidation");
 
-// api for agent signUp
-exports.userRegister = async(req,res)=>{
+exports.CustomerRegisteration = async(req,res)=>{
     try {
         const{email , password, confirmPassword} = req.body
 
@@ -75,7 +75,7 @@ exports.userRegister = async(req,res)=>{
             {
                 $set:
                 {
-                    userType:2
+                    userType:3
                 }
             }
         )
@@ -135,7 +135,7 @@ exports.emailVerificationApi = async (req,res) => {
 }
 
 
-exports.userLogin= async(req,res)=>{
+exports.CustomerLogin= async(req,res)=>{
     try {
         const{email , password} = req.body
 
@@ -146,7 +146,7 @@ exports.userLogin= async(req,res)=>{
         }
 
         // if not exist
-        let user = await User.findOne({email:email,isAdmin:0})
+        let user = await User.findOne({email:email})
         
         if(!user){
             return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
@@ -178,53 +178,7 @@ exports.userLogin= async(req,res)=>{
     }
 }
 
-// separate login api for admin
-exports.adminLogin = async(req,res)=>{
-    try {
-        const{email , password} = req.body
-
-        let validation = userValidation(req.body);
-
-        if(validation && validation.error == true){
-            return responseHandler.handler(res, false, validation.message , [], 422)
-        }
-
-        // if not exist
-        let user = await User.findOne({email:email,isAdmin:1}) // giving 2 filters
-        console.log('user :', user);
-        
-        if(!user){
-            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
-        }
-
-        const passwordMatch = await bcrypt.compare(password , user.password);
-
-        if(!passwordMatch){
-            return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
-        }
-        const payload = {
-            _id: user._id,
-            timestamp: new Date().getTime()
-            }
-
-        const token = jwt.sign(payload , process.env.JWT_SECRET)   
-
-        let hashedToken = encryptToken(token);
-            
-        // saving tokens
-        let tokenCollection = new Token({
-            token : hashedToken,
-            UserId: user._id
-        })
-        let saveToken =await tokenCollection.save()
-        return responseHandler.handler(res,true, message.customMessages.successLoggedIn,token, 201)         
-    } catch (error) {
-        return responseHandler.handler(res,false, message.customMessages.Loginerror, [], 500)
-    }
-
-}
-
-exports.userLogout= async(req,res)=>{
+exports.CustomerLogout= async(req,res)=>{
     try {
         const {token} = req.body
 
@@ -252,7 +206,7 @@ exports.userLogout= async(req,res)=>{
     }
 }
 
-exports.updateProfile= async(req,res)=>{
+exports.CustomerUpdateProfile= async(req,res)=>{
     try {
         const{firstName,lastName,pinCode,city,street,houseNumber}=req.body
 
@@ -278,7 +232,7 @@ exports.updateProfile= async(req,res)=>{
                 }
             }
         )
-
+    
         return responseHandler.handler(res,true, message.customMessages.updateProfile,req.body, 201)
 
     } catch (error) {

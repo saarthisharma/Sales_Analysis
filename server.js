@@ -17,11 +17,14 @@ connectDB();
 // parse requests of content-type - application/json
 app.use(express.json());
 
-// requiring routes
+// requiring agent routes
 app.use(""  ,require("./routes/userRoutes"))
 
 // requiring admin routes
 app.use("" ,require("./routes/adminRoutes"))
+
+// requiring customer routes
+app.use("",require("./routes/customerRoutes"))
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));

@@ -20,6 +20,7 @@ router.get("/listUserOrders",userAuthorization,salesCrudController.listOrders)
 // routes for registration
 router.post("/registration",userController.userRegister)
 router.post("/login",userController.userLogin)
+router.post("/login/admin",userController.adminLogin)
 router.post("/logout",userController.userLogout)
 router.post("/updateProfile", userAuthorization, userController.updateProfile)
 router.get("/emailVerification",userController.emailVerificationApi)
