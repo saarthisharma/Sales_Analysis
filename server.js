@@ -88,6 +88,5 @@ io.on('connection',(socket)=>{
         else{
             socket.disconnect()
             console.log("room space is only for 2 ")
-        }
-
+        }  
 })
