@@ -1,5 +1,5 @@
-const constants = {
+// const constants = {
 
-}
+// }
 
-module.exports = constant
+// module.exports = constant

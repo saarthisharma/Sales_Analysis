@@ -159,7 +159,7 @@ exports.userLogin= async(req,res)=>{
         }
         const payload = {
             _id: user._id,
-            timestamp: new Date().getTime()
+            // timestamp: new Date().getTime()
             }
 
         const token = jwt.sign(payload , process.env.JWT_SECRET)   
