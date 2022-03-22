@@ -14,5 +14,6 @@ module.exports.customMessages= {
     "orderDataUpdated":"Data updated successfully",
     "orderDataDeleted":"Data deleted successfully",
     "paginatedData":"Data fetched successfully",
+    "fetchedHashtag":"Top trending hashtags",
     "error" : "Internal server error"
 }

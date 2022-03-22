@@ -29,6 +29,9 @@ app.use("" ,require("./routes/adminRoutes"))
 // requiring customer routes
 app.use("",require("./routes/customerRoutes"))
 
+// twitter api route
+app.use("",require("./routes/twitterTrendsRoutes"))
+
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 

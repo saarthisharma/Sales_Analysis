@@ -6,6 +6,7 @@ const{customerAuthorization} = require("../middleware/customerAuthorization")
 
 // requiring customer controller
 const customerController = require("../controllers/customerController")
+
 router.post("/registration/customer",customerController.CustomerRegisteration)
 router.post("/login/customer",customerController.CustomerLogin)
 router.post("/logout/customer",customerController.CustomerLogout)
